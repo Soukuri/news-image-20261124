@@ -1,11 +1,21 @@
-// A working news-image-daily entry (Node 22, standard library only): its image is the entry.png beside this file, and
-// the program copies it to /output/entry.png. A starting point, not a winner: replace the image. The gate takes a
-// whole PNG or JPEG of at most 1 MiB and 1024 by 1024 pixels, and the judge sees exactly the bytes copied.
+// News-image entry for make.fun (Node 22, standard library only).
 //
-// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
+// The picture itself is built before submission -- a front page composed
+// from news photos and typeset headlines -- and shipped in this repo as
+// entry.png (JPEG bytes under that name, which the rules allow). This
+// program only puts a copy where the grader reads it. The copy is
+// byte-for-byte, so both of the grader's runs see the same image.
+//
+// Run it outside the grader's container with:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-copyFileSync(new URL('./entry.png', import.meta.url), join(process.env.MAKEFUN_OUTPUT_DIR ?? '/output', 'entry.png'));
+const repoRoot = dirname(fileURLToPath(import.meta.url));
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+
+mkdirSync(outDir, { recursive: true });
+const picture = readFileSync(join(repoRoot, "entry.png"));
+writeFileSync(join(outDir, "entry.png"), picture);
